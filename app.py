@@ -150,7 +150,7 @@ async def handle_group(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not violated:
         return
 
-    # Check if the sender is an admin; if so, do nothing.
+    # Check if sender is admin; if so, no action is needed.
     member = await context.bot.get_chat_member(message.chat.id, message.from_user.id)
     if member.status in ["administrator", "creator"]:
         return
@@ -192,7 +192,7 @@ async def handle_group(update: Update, context: ContextTypes.DEFAULT_TYPE):
         warnings_dict[user_id] = 0
 
 async def welcome_new(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Send a dynamic welcome message to each new group member."""
+    """Send a dynamic welcome message to new group members."""
     for member in update.message.new_chat_members:
         welcome_text = (
             f"🌟 <b>Welcome, {member.first_name}!</b>\n\n"
@@ -209,8 +209,8 @@ application = ApplicationBuilder().token(BOT_TOKEN).build()
 application.add_handler(CommandHandler("start", start))
 application.add_handler(CommandHandler("help", help_command))
 application.add_handler(CallbackQueryHandler(button_handler))
-application.add_handler(MessageHandler(filters.PRIVATE & filters.TEXT & ~filters.COMMAND, handle_private))
-application.add_handler(MessageHandler(filters.GROUP & filters.TEXT & ~filters.COMMAND, handle_group))
+application.add_handler(MessageHandler(filters.ChatType.PRIVATE & filters.TEXT & ~filters.COMMAND, handle_private))
+application.add_handler(MessageHandler((filters.ChatType.GROUP | filters.ChatType.SUPERGROUP) & filters.TEXT & ~filters.COMMAND, handle_group))
 application.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_new))
 
 def run_bot():
@@ -247,7 +247,7 @@ def index():
            <li>Welcoming new members with dynamic messages and clear rules.</li>
            <li>Logging every message and checking for violations.</li>
            <li>Issuing warnings and auto-muting users (for 24 hours) after repeated violations.</li>
-           <li>Forwarding direct messages from users to the admin with an inline menu.</li>
+           <li>Forwarding direct messages from users to the admin via an inline menu.</li>
          </ul>
          <p><b>Commands & Instructions:</b></p>
          <ul>
